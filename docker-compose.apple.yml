@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+    db:
+        platform: linux/amd64
+    frontend:
+        platform: linux/amd64
+    backend:
+        platform: linux/amd64
