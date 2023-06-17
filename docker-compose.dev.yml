@@ -83,10 +83,11 @@ services:
         build:
             context: ./indexer
             dockerfile: Dockerfile
+            target: dev
         env_file:
             - ./indexer/.env
         volumes:
-            - ./indexer:/app
+            - ./indexer:/node/app
         depends_on:
             backend:
                 condition: service_started

@@ -26,3 +26,11 @@ from base as dev
 WORKDIR /var/www
 
 COPY --chmod=755 ./entrypoint.sh /usr/local/bin/entrypoint.sh
+
+from base as prod
+
+# Set working directory
+WORKDIR /var/www
+
+COPY --chmod=755 ./entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY . .

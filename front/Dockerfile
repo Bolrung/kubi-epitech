@@ -31,13 +31,14 @@ CMD yarn start --port ${PORT}
 FROM base AS build
 
 COPY --from=dependencies /home/node/app/node_modules ./node_modules
+COPY --chown=node . .
 
 RUN yarn build --prod
 
 # ----------------------------------------------------------------
 
 # Serve the app with nginx
-FROM nginx:1.17-alpine
+FROM nginx:1.17-alpine as prod
 
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
