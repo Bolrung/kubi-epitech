@@ -1,0 +1,23 @@
+<!-- NGINX -->
+
+_/nginx_
+
+<!-- NOT USEFUL -->
+
+.editorconfig
+\*.md
+.DS_Store
+
+<!-- ENV FILES -->
+
+.env
+
+<!-- GIT -->
+
+.gitignore
+_/.git_
+
+<!-- DOCKER -->
+
+Dockerfile
+.dockerignore
