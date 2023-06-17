@@ -2,7 +2,7 @@ up:
 	docker compose -f docker-compose.dev.yml up -d --build
 
 up-arm:
-	docker compose -f docker-compose.dev.yml -f docker-compose.apple.yml up -d --build
+	docker compose -f docker-compose.dev.yml -f docker-compose.arm.yml up -d --build
 
 stop:
 	docker compose -f docker-compose.dev.yml down
