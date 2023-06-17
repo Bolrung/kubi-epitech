@@ -5,18 +5,18 @@
 
 <!-- NGINX -->
 
-nginx
+_/nginx_
 
 <!-- DEPENDENCIES -->
 
-node_modules
+_/node_modules_
 
 <!-- NOT USEFUL -->
 
-bootstrap
-resources
-storage
-vendor
+_/bootstrap_
+_/resources_
+_/storage_
+_/vendor_
 .editorconfig
 package.json
 README.md
@@ -27,8 +27,9 @@ yarn.lock
 
 .gitattributes
 .gitignore
-.git
+_/.git_
 
 <!-- DOCKER -->
 
 Dockerfile
+.dockerignore
