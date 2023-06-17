@@ -3,8 +3,8 @@ version: "3.7"
 name: kubi
 services:
     frontend:
-        container_name: frontend
-        build: ./front
+        container_name: kubi-frontend
+        image: "ghcr.io/alxbrla/kubi-epitech/frontend:latest@sha256:d3a5bf0884eed9deafdc9c22126e01713e691987f82e6875ee38b80e10bd8c30"
         ports:
             - "3000:80"
         depends_on:
@@ -13,12 +13,8 @@ services:
             - kubi-network
 
     backend:
-        container_name: backend
-        build:
-            args:
-                user: sammy
-                uid: 1000
-            context: ./back
+        container_name: kubi-backend
+        image: "ghcr.io/alxbrla/kubi-epitech/backend:latest@sha256:8de76568dda9b9c4d0fbf46334addaf53dd29ceffe491ef5e806c79c08d73994"
         ports:
             - "9000:9000"
         volumes:
@@ -36,7 +32,7 @@ services:
 
     backend-nginx:
         image: nginx:1.17-alpine
-        container_name: backend-nginx
+        container_name: kubi-backend-nginx
         ports:
             - "3001:8080"
         volumes:
@@ -48,10 +44,12 @@ services:
             - backend
 
     db:
-        container_name: db
+        container_name: kubi-db
         image: mysql:5.7
         ports:
             - "3306:3306"
+        volumes:
+            - kubi-db-data:/var/lib/mysql
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: toto
@@ -66,8 +64,8 @@ services:
             retries: 3
 
     indexer:
-        container_name: indexer
-        build: ./indexer
+        container_name: kubi-indexer
+        image: "ghcr.io/alxbrla/kubi-epitech/indexer:latest@sha256:cf8f123262ffa6f5764d7152e43d0dfd70a72a66a4689cd1bc296e385bc507f6"
         depends_on:
             backend:
                 condition: service_started
@@ -77,9 +75,12 @@ services:
                 condition: service_healthy
         networks:
             - kubi-network
+        environment:
+            - AMQP_URI=amqp://rabbitmq:rabbitmq@rabbitmq:5672/
+            - ELASTICSEARCH_URI=http://elastic-search:9200
 
     rabbitmq:
-        container_name: rabbitmq
+        container_name: kubi-rabbitmq
         image: rabbitmq:3.11.13-alpine
         ports:
             - "5672:5672"
@@ -97,7 +98,7 @@ services:
             start_period: 10s
 
     elastic-search:
-        container_name: elastic-search
+        container_name: kubi-elastic-searchex
         image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
         ports:
             - "9200:9200"
@@ -124,3 +125,7 @@ networks:
         # name the network
         name: kubi-network
         driver: bridge
+
+volumes:
+    kubi-db-data:
+        driver: local
