@@ -20,6 +20,9 @@ CMD [ "yarn", "dev" ]
 from base as prod
 
 COPY --from=dependencies /node/app/node_modules /node/node_modules
+
 COPY . .
+
+ENV PATH /node/node_modules/.bin:$PATH
 
 CMD [ "yarn", "start" ]
