@@ -10,18 +10,18 @@ RUN mkdir -p /home/node/app
 # ----------------------------------------------------------------
 from base as dependencies
 
-COPY package.json yarn.lock  .
+COPY --chown=node package.json yarn.lock  .
 
-RUN yarn --silent
+RUN yarn
 
 # ----------------------------------------------------------------
 
 # Run the app in dev mode
 FROM base AS dev
 
-COPY --from=dependencies /home/node/app/node_modules ./node_modules
+COPY --from=dependencies --chown=node /home/node/app/node_modules /home/node/node_modules
 
-COPY . .
+ENV PATH /home/node/node_modules/.bin:$PATH
 
 CMD yarn start --port ${PORT}
 
@@ -30,9 +30,9 @@ CMD yarn start --port ${PORT}
 # Build the app for production
 FROM base AS build
 
-COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /home/node/app/node_modules ./node_modules
 
-CMD yarn build --prod
+RUN yarn build --prod
 
 # ----------------------------------------------------------------
 
@@ -41,6 +41,6 @@ FROM nginx:1.17-alpine
 
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
-COPY --from=build /app/dist/front/ /usr/share/nginx/html
+COPY --from=build /home/node/app/dist/front/ /usr/share/nginx/html
 
 EXPOSE 80

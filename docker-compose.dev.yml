@@ -12,7 +12,7 @@ services:
             dockerfile: Dockerfile
             target: dev
         volumes:
-            - ./front:/app
+            - ./front:/home/node/app
         ports:
             - "3000:4000"
         depends_on:
@@ -74,6 +74,8 @@ services:
             interval: 30s
             timeout: 10s
             retries: 3
+        volumes:
+            - kubi-db-data:/var/lib/mysql
 
     indexer:
         container_name: kubi-indexer
@@ -141,3 +143,7 @@ networks:
         # name the network
         name: kubi-network
         driver: bridge
+
+volumes:
+    kubi-db-data:
+        name: kubi-db-data
