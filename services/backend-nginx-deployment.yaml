@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: backend-nginx
+  name: backend-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: backend-nginx
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/kubi-network: "true"
+        io.kompose.service: backend-nginx
+    spec:
+      containers:
+        - image: nginx:1.17-alpine
+          name: backend-nginx
+          ports:
+            - containerPort: 8080
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/www
+              name: backend-nginx-claim0
+            - mountPath: /etc/nginx/conf.d
+              name: backend-nginx-claim1
+      restartPolicy: Always
+      volumes:
+        - name: backend-nginx-claim0
+          persistentVolumeClaim:
+            claimName: backend-nginx-claim0
+        - name: backend-nginx-claim1
+          persistentVolumeClaim:
+            claimName: backend-nginx-claim1
+status: {}

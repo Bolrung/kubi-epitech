@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: indexer
+  name: indexer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: indexer
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/kubi-network: "true"
+        io.kompose.service: indexer
+    spec:
+      containers:
+        - image: indexer
+          name: indexer
+          resources: {}
+      restartPolicy: Always
+status: {}
