@@ -1,12 +1,20 @@
-version: "3.7"
+version: "3.8"
 
 name: kubi
 services:
     frontend:
         container_name: kubi-frontend
-        image: "ghcr.io/alxbrla/kubi-epitech/frontend:latest@sha256:d3a5bf0884eed9deafdc9c22126e01713e691987f82e6875ee38b80e10bd8c30"
+        image: kubi-frontend
+        env_file:
+            - ./front/.env
+        build:
+            context: ./front
+            dockerfile: Dockerfile
+            target: dev
+        volumes:
+            - ./front:/home/node/app
         ports:
-            - "3000:80"
+            - "3000:4000"
         depends_on:
             - backend-nginx
         networks:
@@ -14,7 +22,13 @@ services:
 
     backend:
         container_name: kubi-backend
-        image: "ghcr.io/alxbrla/kubi-epitech/backend:latest@sha256:8de76568dda9b9c4d0fbf46334addaf53dd29ceffe491ef5e806c79c08d73994"
+        image: kubi-backend
+        env_file:
+            - ./back/.env
+        build:
+            context: ./back
+            dockerfile: Dockerfile
+            target: dev
         ports:
             - "9000:9000"
         volumes:
@@ -32,9 +46,9 @@ services:
 
     backend-nginx:
         image: nginx:1.17-alpine
-        container_name: kubi-backend-nginx
+        container_name: backend-nginx
         ports:
-            - "3001:8080"
+            - "8000:8080"
         volumes:
             - ./back/:/var/www
             - ./back/nginx/:/etc/nginx/conf.d
@@ -48,8 +62,6 @@ services:
         image: mysql:5.7
         ports:
             - "3306:3306"
-        volumes:
-            - kubi-db-data:/var/lib/mysql
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: toto
@@ -62,10 +74,20 @@ services:
             interval: 30s
             timeout: 10s
             retries: 3
+        volumes:
+            - kubi-db-data:/var/lib/mysql
 
     indexer:
         container_name: kubi-indexer
-        image: "ghcr.io/alxbrla/kubi-epitech/indexer:latest@sha256:cf8f123262ffa6f5764d7152e43d0dfd70a72a66a4689cd1bc296e385bc507f6"
+        image: kubi-indexer
+        build:
+            context: ./indexer
+            dockerfile: Dockerfile
+            target: dev
+        env_file:
+            - ./indexer/.env
+        volumes:
+            - ./indexer:/node/app
         depends_on:
             backend:
                 condition: service_started
@@ -75,9 +97,6 @@ services:
                 condition: service_healthy
         networks:
             - kubi-network
-        environment:
-            - AMQP_URI=amqp://rabbitmq:rabbitmq@rabbitmq:5672/
-            - ELASTICSEARCH_URI=http://elastic-search:9200
 
     rabbitmq:
         container_name: kubi-rabbitmq
@@ -98,7 +117,7 @@ services:
             start_period: 10s
 
     elastic-search:
-        container_name: kubi-elastic-searchex
+        container_name: kubi-elastic-search
         image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
         ports:
             - "9200:9200"
@@ -128,4 +147,4 @@ networks:
 
 volumes:
     kubi-db-data:
-        driver: local
+        name: kubi-db-data

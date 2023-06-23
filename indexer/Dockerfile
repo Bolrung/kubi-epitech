@@ -1,10 +1,28 @@
-FROM node:14.20.0
+FROM node:14.20.0 as base
 
-WORKDIR /app
+USER node
+WORKDIR /node/app
+
+FROM base as dependencies
+
+COPY package.json yarn.lock ./
+
+RUN yarn --silent
+
+from base as dev
+
+COPY --from=dependencies /node/app/node_modules /node/node_modules
+
+ENV PATH /node/node_modules/.bin:$PATH
+
+CMD [ "yarn", "dev" ]
+
+from base as prod
+
+COPY --from=dependencies /node/app/node_modules /node/node_modules
 
 COPY . .
-ENV AMQP_URI amqp://rabbitmq:rabbitmq@rabbitmq:5672/
-ENV ELASTICSEARCH_URI http://elastic-search:9200
-RUN yarn 
+
+ENV PATH /node/node_modules/.bin:$PATH
 
 CMD [ "yarn", "start" ]

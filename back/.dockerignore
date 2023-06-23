@@ -1,0 +1,35 @@
+<!-- ENV FILES -->
+
+.env
+.env.example
+
+<!-- NGINX -->
+
+_/nginx_
+
+<!-- DEPENDENCIES -->
+
+_/node_modules_
+
+<!-- NOT USEFUL -->
+
+_/bootstrap_
+_/resources_
+_/storage_
+_/vendor_
+.editorconfig
+package.json
+README.md
+webpack.mix.js
+yarn.lock
+
+<!-- GIT -->
+
+.gitattributes
+.gitignore
+_/.git_
+
+<!-- DOCKER -->
+
+Dockerfile
+.dockerignore

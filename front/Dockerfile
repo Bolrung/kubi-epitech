@@ -1,22 +1,47 @@
-# Stage 1 - the build process
-FROM node:14.20.0 AS build
+# Node base image with deependencies
+FROM node:14.20.0 AS base
 
-WORKDIR /app
+USER node
 
-ENV PATH /app/node_modules/.bin:$PATH
+WORKDIR /home/node/app
 
-COPY . .
+RUN mkdir -p /home/node/app
 
-RUN yarn 
+# ----------------------------------------------------------------
+from base as dependencies
+
+COPY --chown=node package.json yarn.lock  .
+
+RUN yarn
+
+# ----------------------------------------------------------------
+
+# Run the app in dev mode
+FROM base AS dev
+
+COPY --from=dependencies --chown=node /home/node/app/node_modules /home/node/node_modules
+
+ENV PATH /home/node/node_modules/.bin:$PATH
+
+CMD yarn start --port ${PORT}
+
+# ----------------------------------------------------------------
+
+# Build the app for production
+FROM base AS build
+
+COPY --from=dependencies /home/node/app/node_modules ./node_modules
+COPY --chown=node . .
 
 RUN yarn build --prod
 
-# Stage 2 - the production environment
+# ----------------------------------------------------------------
 
-FROM nginx:1.17-alpine
+# Serve the app with nginx
+FROM nginx:1.17-alpine as prod
 
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
-COPY --from=build /app/dist/front/ /usr/share/nginx/html
+COPY --from=build /home/node/app/dist/front/ /usr/share/nginx/html
 
 EXPOSE 80
