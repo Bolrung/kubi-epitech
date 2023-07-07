@@ -16,7 +16,6 @@ _/node_modules_
 _/bootstrap_
 _/resources_
 _/storage_
-_/vendor_
 .editorconfig
 package.json
 README.md
