@@ -13,9 +13,6 @@ _/node_modules_
 
 <!-- NOT USEFUL -->
 
-_/bootstrap_
-_/resources_
-_/storage_
 .editorconfig
 package.json
 README.md
