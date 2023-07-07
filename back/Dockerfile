@@ -1,5 +1,7 @@
 FROM php:7.4-fpm as base
-user php
+RUN useradd -ms /bin/bash php-user
+USER php-user
+WORKDIR /var/www
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
@@ -29,7 +31,7 @@ COPY --chmod=755 ./entrypoint.sh /usr/local/bin/entrypoint.sh
 
 from base as prod
 
-user php
+USER php-user
 # Set working directory
 WORKDIR /var/www
 COPY --chmod=755 ./entrypoint.sh /usr/local/bin/entrypoint.sh
