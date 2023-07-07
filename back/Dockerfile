@@ -17,7 +17,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest --chmod=755 /usr/bin/composer /usr/bin/composer
 
 
 from base as dev
@@ -33,6 +33,6 @@ RUN useradd -ms /bin/bash php-user
 USER php-user
 # Set working directory
 WORKDIR /var/www
-COPY --chmod=755 ./entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --chown=php-user:php-user --chmod=755 ./entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY --chown=php-user:php-user . .
 RUN composer install
