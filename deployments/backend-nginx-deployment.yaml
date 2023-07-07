@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configmap
+data:
+  nginx.conf: |
+      events {
+          worker_connections 1024;
+        }
+      http {
+          server {
+              listen 8080;
+              index index.php index.html;
+              error_log /var/log/nginx/error.log;
+              access_log /var/log/nginx/access.log;
+              root /var/www/public;
+              server_name backend-nginx.local;
+              location ~ \.php$ {
+                  try_files $uri =404;
+                  fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                  fastcgi_pass $backend_container;
+                  fastcgi_index index.php;
+                  include fastcgi_params;
+                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                  fastcgi_param PATH_INFO $fastcgi_path_info;
+              }
+              location / {
+                  try_files $uri $uri/ /index.php?$query_string;
+                  gzip_static on;
+              }
+          }
+      }
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: backend-nginx
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/kubi-network: "true"
+        io.kompose.service: backend-nginx
+    spec:
+      containers:
+        - image: nginx:1.17-alpine
+          name: kubi-backend-nginx
+          ports:
+            - containerPort: 8080
+          resources: {}
+          env: 
+            - name: backend_container
+              value: backend
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      restartPolicy: Always
+      volumes:
+        - name: nginx-config
+          configMap: 
+            name: nginx-configmap
+            items: 
+            - key: nginx.conf
+              path: nginx.conf
+status: {}
+
+--- 
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: backend-nginx
+  name: backend-nginx
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: backend-nginx
+status:
+  loadBalancer: {}
+
+

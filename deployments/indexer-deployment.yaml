@@ -25,8 +25,13 @@ spec:
         io.kompose.service: indexer
     spec:
       containers:
-        - image: indexer
-          name: indexer
+        - env:
+            - name: AMQP_URI
+              value: amqp://rabbitmq:rabbitmq@rabbitmq:5672/
+            - name: ELASTICSEARCH_URI
+              value: http://elastic-search:9200
+          image: ghcr.io/alxbrla/kubi-epitech/indexer:latest@sha256:cf8f123262ffa6f5764d7152e43d0dfd70a72a66a4689cd1bc296e385bc507f6
+          name: kubi-indexer
           resources: {}
       restartPolicy: Always
 status: {}

@@ -39,7 +39,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 30
             timeoutSeconds: 30
-          name: rabbitmq
+          name: kubi-rabbitmq
           ports:
             - containerPort: 5672
             - containerPort: 15672

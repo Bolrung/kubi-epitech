@@ -1,44 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.28.0 (HEAD)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: backend
   name: backend
+  labels:
+    app: backend
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      io.kompose.service: backend
-  strategy:
-    type: Recreate
+      app: backend
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.28.0 (HEAD)
-      creationTimestamp: null
       labels:
-        io.kompose.network/kubi-network: "true"
-        io.kompose.service: backend
+        app: backend
     spec:
       containers:
-        - command:
-            - /usr/local/bin/entrypoint.sh
-          image: backend
-          name: backend
-          ports:
-            - containerPort: 9000
-          resources: {}
-          volumeMounts:
-            - mountPath: /var/www
-              name: backend-claim0
-      restartPolicy: Always
-      volumes:
-        - name: backend-claim0
-          persistentVolumeClaim:
-            claimName: backend-claim0
-status: {}
+      - name: backend
+        image: ghcr.io/alxbrla/kubi-epitech/backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9000
+      imagePullSecrets:
+      - name: pullsecret
+      -   command:
+           - “tail”
+           - “-f”
+           - “/dev/null”
