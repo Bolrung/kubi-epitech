@@ -32,7 +32,7 @@ from base as prod
 RUN useradd -ms /bin/bash php-user
 USER php-user
 # Set working directory
-WORKDIR /var/www
+WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 
