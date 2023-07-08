@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configmap
+data:
+  nginx.conf: |
+      events {
+          worker_connections 1024;
+        }
+      http {
+          server {
+              listen 8080;
+              index index.php index.html;
+              error_log /var/log/nginx/error.log;
+              access_log /var/log/nginx/access.log;
+              root /var/www/html/public;
+
+              # location /api/health {
+              #   return 200 'Hello World!';
+              # }
+              
+              location ~ \.php$ {
+                  try_files $uri =404;
+                  fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                  fastcgi_pass 127.0.0.1:9000;
+                  fastcgi_index index.php;
+                  fastcgi_intercept_errors on;
+                  include fastcgi_params;
+                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                  fastcgi_param PATH_INFO $fastcgi_path_info;
+              }
+              location / {
+                  try_files $uri $uri/ /index.php?$query_string;
+                  gzip_static on;
+              }
+          }
+      }
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: backend-nginx
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/kubi-network: "true"
+        io.kompose.service: backend-nginx
+    spec:
+      containers:
+        - image: nginx:1.17-alpine
+          name: kubi-backend-nginx
+          ports:
+            - containerPort: 8080
+          resources: {}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: shared-files
+              mountPath: /var/www
+        - image: ghcr.io/alxbrla/kubi-epitech/backend:latest
+          imagePullPolicy: Always
+          name: backend
+          ports:
+            - containerPort: 9000
+          env:
+          - name: APP_NAME
+            value: "Laravel"
+          - name: APP_ENV
+            value: "production"
+          - name: APP_KEY
+            value: "base64:R5OjyG1up1JRLPB4+d86Lj8Yo/rJJnI6qAjvL6g7qtY="
+          - name: APP_DEBUG
+            value: "true"
+          - name: LOG_CHANNEL
+            value: "stderr"
+          - name: DB_HOST
+            value: "db"
+          - name: DB_PORT
+            value: "3306"
+          - name: DB_DATABASE
+            value: "database"
+          - name: DB_USERNAME
+            value: "user"
+          - name: DB_PASSWORD
+            value: "password"
+          volumeMounts:
+            - name: shared-files
+              mountPath: /var/shared
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "entrypoint.sh"]
+                command: ["/bin/sh", "-c", "cp -r /var/www/. /var/shared"]
+      imagePullSecrets:
+      - name: pullsecret
+      restartPolicy: Always
+      volumes:
+        - name: nginx-config
+          configMap: 
+            name: nginx-configmap
+            items: 
+            - key: nginx.conf
+              path: nginx.conf
+        - name: shared-files
+          emptyDir: {}
+status: {}
+
+--- 
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: backend-nginx
+  name: backend-nginx
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: backend-nginx
+status:
+  loadBalancer: {}
+
+

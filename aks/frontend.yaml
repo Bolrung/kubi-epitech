@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ghcr.io/alxbrla/kubi-epitech/frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env: 
+          - name: backend_nginx_container
+            value: "backend-nginx"
+      imagePullSecrets:
+      - name: pullsecret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+  selector:
+    app: frontend
+  type: LoadBalancer
+
