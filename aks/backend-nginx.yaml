@@ -103,7 +103,6 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "entrypoint.sh"]
                 command: ["/bin/sh", "-c", "cp -r /var/www/. /var/shared"]
       imagePullSecrets:
       - name: pullsecret
