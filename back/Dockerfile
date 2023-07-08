@@ -40,3 +40,4 @@ COPY . .
 RUN composer install
 RUN usermod -u 1000 www-data
 RUN chown -R www-data:www-data /var/www/html
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
