@@ -33,6 +33,9 @@ RUN useradd -ms /bin/bash php-user
 USER php-user
 # Set working directory
 WORKDIR /var/www
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+
 COPY --chown=php-user:php-user --chmod=755 ./entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY --chown=php-user:php-user . .
 RUN composer install
