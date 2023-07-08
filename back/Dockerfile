@@ -38,3 +38,5 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY --chmod=755 ./entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY . .
 RUN composer install
+RUN usermod -u 1000 www-data
+RUN chown -R www-data:www-data /var/www/html
