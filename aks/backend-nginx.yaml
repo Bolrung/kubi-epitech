@@ -97,6 +97,21 @@ spec:
             value: "user"
           - name: DB_PASSWORD
             value: "password"
+          - name: ELASTICSEARCH_URI
+            value: "http://elastic-search:9200"
+          - name: ELASTICSEARCH_HOST
+            value: "elastic-search"
+          - name: ELASTICSEARCH_PORT
+            value: "9200"
+          - name: RABBITMQ_PORT
+            value: "5672"
+          - name: RABBITMQ_DEFAULT_USER
+            value: "rabbitmq"
+          - name: RABBITMQ_DEFAULT_PASS
+            value: "rabbitmq"
+          - name: AMQP_URI
+            value: "amqp://rabbitmq:rabbitmq@rabbitmq:5672/"
+          
           volumeMounts:
             - name: shared-files
               mountPath: /var/shared
